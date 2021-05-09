@@ -1,0 +1,22 @@
+<mat-card class="mat-elevation-z8 text-center">
+
+  <app-input label="CNAE / CNPJ" placeholder="Informe o CNAE ou CNPJ" [showLabel]="false" [control]="search"></app-input>
+
+  <button mat-raised-button type="button" color="primary" [disabled]="loading || search.invalid" (click)="consult()">
+    <span *ngIf="!loading">Consultar</span>
+    <span *ngIf="loading">Consultando...</span>
+  </button>
+
+</mat-card>
+
+<mat-card class="mat-elevation-z8 text-center" *ngIf="showSuccess">
+  <h4>Tudo certo!</h4>
+</mat-card>
+
+<mat-card class="mat-elevation-z8 text-center" *ngIf="class && !showSuccess">
+  
+  <mat-radio-group [(ngModel)]="subClassId" (change)="selectSubClass()">
+    <mat-radio-button *ngFor="let subclass of class._subclasses" [value]="subclass.id">{{ subclass.name }}</mat-radio-button>
+  </mat-radio-group>
+
+</mat-card>
