@@ -93,4 +93,7 @@
 
   <div *ngIf="control.hasError('min')">Valor mínimo <b>{{ control.getError('min').min }}</b>, atual <b>{{ control.getError('min').actual }}</b>!</div>
   <div *ngIf="control.hasError('max')">Valor máximo <b>{{ control.getError('max').max }}</b>, atual <b>{{ control.getError('max').actual }}</b>!</div>
+
+  <div *ngIf="control.hasError('minlength')">{{ label }} deve ser maior que <b>{{ control.getError('minlength').requiredLength }} caracteres</b>, atualmente contêm <b>{{ control.getError('minlength').actualLength }}</b>!</div>
+  <div *ngIf="control.hasError('maxlength')">{{ label }} deve ser menor ou igual à <b>{{ control.getError('maxlength').requiredLength }} caracteres</b>, atualmente contêm <b>{{ control.getError('maxlength').actualLength }}</b>!</div>
 </ng-template>

@@ -1,22 +1,26 @@
-<mat-card class="mat-elevation-z8 text-center">
+<mat-card class="mat-elevation-z8 text-center mb-5">
 
-  <app-input label="CNAE / CNPJ" placeholder="Informe o CNAE ou CNPJ" [showLabel]="false" [control]="search"></app-input>
-
-  <button mat-raised-button type="button" color="primary" [disabled]="loading || search.invalid" (click)="consult()">
-    <span *ngIf="!loading">Consultar</span>
-    <span *ngIf="loading">Consultando...</span>
-  </button>
-
-</mat-card>
-
-<mat-card class="mat-elevation-z8 text-center" *ngIf="showSuccess">
-  <h4>Tudo certo!</h4>
-</mat-card>
-
-<mat-card class="mat-elevation-z8 text-center" *ngIf="class && !showSuccess">
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+    <app-input label="CNAE / CNPJ" placeholder="Informe o CNAE ou CNPJ" [showLabel]="false" [control]="controls.search"></app-input>
   
+    <button mat-raised-button type="submit" color="primary" [disabled]="submitting || formGroup.invalid">
+      <span *ngIf="!submitting">Consultar</span>
+      <span *ngIf="submitting">Consultando...</span>
+    </button>
+  </form>
+
+</mat-card>
+
+<!-- SUBCLASSES -->
+<mat-card class="mat-elevation-z8 text-center" *ngIf="class && !showSuccess && !showRequired">
+  <h2>SubClasses</h2>
   <mat-radio-group [(ngModel)]="subClassId" (change)="selectSubClass()">
     <mat-radio-button *ngFor="let subclass of class._subclasses" [value]="subclass.id">{{ subclass.name }}</mat-radio-button>
   </mat-radio-group>
+</mat-card>
 
+<!-- RESULT -->
+<mat-card class="mat-elevation-z8 text-center" *ngIf="showSuccess || showRequired">
+  <h4 *ngIf="showSuccess">Tudo certo!</h4>
+  <h4 *ngIf="showRequired">Subclasse obrigatória!</h4>
 </mat-card>
