@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
   ) {
     this.formGroup = this.formBuilder.group({
       search: new FormControl('', [Validators.required, Validators.minLength(5)])
-    })
+    });
   }
 
   ngOnInit(): void { }
@@ -53,39 +53,38 @@ export class HomeComponent implements OnInit {
   async onSubmit(): Promise<void> {
     this.showSuccess = false;
     this.showRequired = false;
-    
+
     if (this.formGroup.valid) {
       this.submitting = true;
       const value = this.formGroup.value.search;
-  
+
       try {
-        if (value.length === 5) {
+        if (value.length === 5)
           await this._class.getById(value).then(async res => {
             this.class = res;
             this.class._subclasses = await this._subclass.getByClassIdRequired(this.class.id);
             if (!this.class._subclasses.find(subclass => subclass.required)) this.showSuccess = true;
           });
-        } else if (value.length === 7) {
+        else if (value.length === 7)
           await this._subclass.getById(value).then(async res => {
             this.showSuccess = !res.required;
             this.showRequired = res.required;
           });
-        } else if (value.length === 14) {
+        else if (value.length === 14)
           await this._hubDev.getCNPJ(value).then(async res => {
             const subclasses = await this._subclass.getAllActive();
             res.atividades_secundarias.forEach(item => {
               const code = item.code.replace(/\./g, '').replace(/\-/g, '');
-              const subclass = subclasses.find(sub => sub.id == code);
+              const subclass = subclasses.find(sub => sub.id === code);
               if (subclass) {
                 this.showSuccess = !subclass.required;
                 this.showRequired = subclass.required;
-              }
-            })
+              } else throw new Error('Subclass not found!');
+            });
           });
-        }
       } catch (error) {
         console.error(error);
-        this._util.message('Infelizmente não encontramos nada!', 'warn')
+        this._util.message('Infelizmente não encontramos nada!', 'warn');
       }
     } else this._util.message('Verifique os dados antes de continuar!', 'warn');
 

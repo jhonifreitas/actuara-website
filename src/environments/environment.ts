@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   hubDev: {
-    host: 'https://ws.hubdodesenvolvedor.com.br/v2/',
+    host: 'https://ws.hubdodesenvolvedor.com.br/v2',
     token: '109048265bwlQMidsfA196883336'
   },
   firebase: {

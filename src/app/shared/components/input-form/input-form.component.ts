@@ -11,14 +11,14 @@ export class InputFormComponent {
   @Input() label!: string;
   @Input() control!: FormControl;
 
+  @Input() id = '';
+  @Input() hint = '';
+  @Input() class = '';
   @Input() type = 'text';
-  @Input() id: string = '';
+  @Input() inputmode = '';
   @Input() cdkFocus = false;
   @Input() showLabel = true;
-  @Input() hint: string = '';
-  @Input() class: string = '';
-  @Input() inputmode: string = '';
-  @Input() placeholder: string = '';
+  @Input() placeholder = '';
   @Input() maxlength: number | string = '';
 
   // MASK

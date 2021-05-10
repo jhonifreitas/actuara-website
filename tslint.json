@@ -12,7 +12,7 @@
     },
     "array-type": false,
     "arrow-return-shorthand": true,
-    "curly": true,
+    "curly": [true, "as-needed"],
     "deprecation": {
       "severity": "warning"
     },
@@ -84,7 +84,7 @@
     },
     "typedef": [
       true,
-      "call-signature"
+      "parameter"
     ],
     "typedef-whitespace": {
       "options": [
@@ -108,7 +108,8 @@
       "options": [
         "ban-keywords",
         "check-format",
-        "allow-pascal-case"
+        "allow-pascal-case",
+        "allow-leading-underscore"
       ]
     },
     "whitespace": {
