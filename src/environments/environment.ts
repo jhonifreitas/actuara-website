@@ -4,6 +4,10 @@
 
 export const environment = {
   production: false,
+  hubDev: {
+    host: 'https://ws.hubdodesenvolvedor.com.br/v2/',
+    token: '109048265bwlQMidsfA196883336'
+  },
   firebase: {
     apiKey: 'AIzaSyBb4SdBTSM-WzCJYYmgqprMM1SpHAg-xA4',
     authDomain: 'actuar-cnae.firebaseapp.com',
