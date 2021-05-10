@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "actuara-cnae-website",
+    "public": "dist/website",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
