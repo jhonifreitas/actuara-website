@@ -1,9 +1,6 @@
 export const environment = {
   production: true,
-  hubDev: {
-    host: 'https://ws.hubdodesenvolvedor.com.br/v2',
-    token: '109048265bwlQMidsfA196883336'
-  },
+  hostApi: 'https://southamerica-east1-actuar-cnae.cloudfunctions.net/api',
   firebase: {
     apiKey: 'AIzaSyBb4SdBTSM-WzCJYYmgqprMM1SpHAg-xA4',
     authDomain: 'actuar-cnae.firebaseapp.com',

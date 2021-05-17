@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { environment } from 'src/environments/environment';
+import { ApiService } from './api.service';
 
 interface CNPJ {
   numero_de_inscricao: string;
@@ -41,21 +40,11 @@ interface CNPJ {
 })
 export class HubDevService {
 
-  private host = environment.hubDev.host;
-  private token = environment.hubDev.token;
-
   constructor(
-    private http: HttpClient
+    private _api: ApiService
   ) { }
 
-  private get headers() {
-    return new HttpHeaders({'Content-Type': 'application/json'});
-  }
-
   async getCNPJ(cnpj: string): Promise<CNPJ> {
-    return new Promise((resolve, reject) => {
-      this.http.get(`${this.host}/cnpj?cnpj=${cnpj}&token=${this.token}`, {headers: this.headers})
-        .subscribe((res: any) => resolve(res.result), err => reject(err));
-    });
+    return this._api.get(`hub-dev/cnpj`, {cnpj}).then(res => res.result);
   }
 }
