@@ -41,9 +41,8 @@ export class HomeComponent implements OnInit {
   }
 
   selectSubClass() {
-    if (this.class && this.class._subclasses?.length) {
+    if (this.class && this.class._subclasses?.length)
       this.subClass = this.class._subclasses.find(subclass => subclass.id === this.subClassId);
-    }
   }
 
   async onSubmit(): Promise<void> {
