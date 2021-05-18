@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Class } from 'src/app/models/class';
+import { Class, SubClass } from 'src/app/models/class';
 
 import { UtilService } from 'src/app/services/util.service';
 import { HubDevService } from 'src/app/services/api/hub-dev.service';
@@ -17,10 +17,10 @@ export class HomeComponent implements OnInit {
 
   class?: Class;
   submitting = false;
+  subClass?: SubClass;
   subClassId!: string;
   showSuccess = false;
   formGroup: FormGroup;
-  showRequired = false;
 
   constructor(
     private _util: UtilService,
@@ -42,17 +42,13 @@ export class HomeComponent implements OnInit {
 
   selectSubClass() {
     if (this.class && this.class._subclasses?.length) {
-      const subClass = this.class._subclasses.find(subclass => subclass.id === this.subClassId);
-      if (subClass) {
-        this.showSuccess = !subClass.required;
-        this.showRequired = subClass.required;
-      }
+      this.subClass = this.class._subclasses.find(subclass => subclass.id === this.subClassId);
     }
   }
 
   async onSubmit(): Promise<void> {
+    this.subClass = undefined;
     this.showSuccess = false;
-    this.showRequired = false;
 
     if (this.formGroup.valid) {
       this.submitting = true;
@@ -66,21 +62,20 @@ export class HomeComponent implements OnInit {
             if (!this.class._subclasses.find(subclass => subclass.required)) this.showSuccess = true;
           });
         else if (value.length === 7)
-          await this._subclass.getById(value).then(async res => {
-            this.showSuccess = !res.required;
-            this.showRequired = res.required;
-          });
+          await this._subclass.getById(value).then(async res => this.subClass = res);
         else if (value.length === 14)
           await this._hubDev.getCNPJ(value).then(async res => {
             const subclasses = await this._subclass.getAllActive();
-            res.atividades_secundarias.forEach(item => {
-              const code = item.code.replace(/\./g, '').replace(/\-/g, '');
-              const subclass = subclasses.find(sub => sub.id === code);
-              if (subclass) {
-                this.showSuccess = !subclass.required;
-                this.showRequired = subclass.required;
-              } else throw new Error('Subclass not found!');
-            });
+            const mainCode = res.atividade_principal.code.replace(/\./g, '').replace(/\-/g, '');
+            this.subClass = subclasses.find(sub => sub.id === mainCode);
+
+            if (!this.subClass)
+              for (const item of res.atividades_secundarias) {
+                const code = item.code.replace(/\./g, '').replace(/\-/g, '');
+                this.subClass = subclasses.find(sub => sub.id === code);
+              }
+
+            if (!this.subClass) throw new Error('Subclass not found!');
           });
       } catch (error) {
         console.error(error);

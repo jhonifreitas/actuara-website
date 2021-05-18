@@ -12,15 +12,20 @@
 </mat-card>
 
 <!-- SUBCLASSES -->
-<mat-card class="mat-elevation-z8 text-center" *ngIf="class && !showSuccess && !showRequired">
+<mat-card class="mat-elevation-z8 text-center" *ngIf="class && !showSuccess && !subClass">
   <h2>SubClasses</h2>
-  <mat-radio-group [(ngModel)]="subClassId" (change)="selectSubClass()">
-    <mat-radio-button *ngFor="let subclass of class._subclasses" [value]="subclass.id">{{ subclass.name }}</mat-radio-button>
+  <mat-radio-group [(ngModel)]="subClassId" fxLayout="column" (change)="selectSubClass()">
+    <mat-radio-button class="mb-2" *ngFor="let subclass of class._subclasses" [value]="subclass.id">{{ subclass.name }}</mat-radio-button>
   </mat-radio-group>
 </mat-card>
 
 <!-- RESULT -->
-<mat-card class="mat-elevation-z8 text-center" *ngIf="showSuccess || showRequired">
-  <h4 *ngIf="showSuccess">Tudo certo!</h4>
-  <h4 *ngIf="showRequired">Subclasse obrigatória!</h4>
+<mat-card class="mat-elevation-z8 text-center" *ngIf="showSuccess">
+  <h4>Tudo certo!</h4>
+</mat-card>
+
+<mat-card class="mat-elevation-z8 text-center" *ngIf="subClass">
+  <h5>{{ subClass.id }} - {{ subClass.name }}</h5>
+  <h4 *ngIf="!subClass.required">Tudo certo!</h4>
+  <h4 *ngIf="subClass.required">Obrigatório!</h4>
 </mat-card>
