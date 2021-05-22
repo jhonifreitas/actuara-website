@@ -1,5 +1,22 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
     <div id="logo"> Actuara CNAE </div>
+
+    <div fxFlex fxLayout="row" fxLayoutAlign="flex-end">
+      <ul fxLayout="row" fxLayoutGap="20px">
+        <li>
+          <button mat-button [matMenuTriggerFor]="menu">
+            <mat-icon>person_outline</mat-icon>
+            {{ _storage.getUser?.name }}
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>exit_to_app</mat-icon>
+              Sair
+            </button>
+          </mat-menu>
+        </li>
+      </ul>
+    </div>
   </mat-toolbar-row>
 </mat-toolbar>

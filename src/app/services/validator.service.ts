@@ -1,10 +1,24 @@
-import { Injectable } from '@angular/core';
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ValidatorService {
+export class CustomValidator {
+
+  static CPF(control: AbstractControl): ValidatorFn {
+    const value = control.value;
+    let result: any = null;
+    if (control.value && !CustomValidator.checkCPF(value)) result = {invalid: true};
+    return result;
+  }
+
+  static CNPJ(control: AbstractControl): ValidatorFn {
+    const value = control.value;
+    let result: any = null;
+    if (control.value && !CustomValidator.checkCNPJ(value)) result = {invalid: true};
+    return result;
+  }
+
+  static cleanCPF(value: string): string {
+    return value.replace(/\./gi, '').replace('-', '');
+  }
 
   static checkCPF(cpf: string): boolean {
     let digit1 = 0;
@@ -39,17 +53,43 @@ export class ValidatorService {
     return valid;
   }
 
-  constructor() { }
+  static checkCNPJ(value: string) {
+    if (!value) return false;
+    const cnpj = String(value).replace(/\D/g, '');
 
-  // CPF
-  validatorCPF(control: AbstractControl): ValidatorFn {
-    const value = control.value;
-    let result: any = null;
-    if (control.value && !ValidatorService.checkCPF(value)) result = {invalid: true};
-    return result;
-  }
-
-  cleanCPF(cpf: string): string {
-    return cpf.replace(/\./gi, '').replace('-', '');
+    if (!cnpj || cnpj.length !== 14
+      || cnpj === '00000000000000'
+      || cnpj === '11111111111111'
+      || cnpj === '22222222222222'
+      || cnpj === '33333333333333'
+      || cnpj === '44444444444444'
+      || cnpj === '55555555555555'
+      || cnpj === '66666666666666'
+      || cnpj === '77777777777777'
+      || cnpj === '88888888888888'
+      || cnpj === '99999999999999')
+      return false;
+    let tamanho = cnpj.length - 2;
+    let numeros = cnpj.substring(0, tamanho);
+    const digitos = cnpj.substring(tamanho);
+    let soma = 0;
+    let pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+      soma += Number.parseInt(numeros.charAt(tamanho - i), 0) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    let resultado = (soma % 11 < 2 ? 0 : 11 - soma % 11).toString();
+    if (resultado !== digitos.charAt(0)) return false;
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+      soma += Number.parseInt(numeros.charAt(tamanho - i), 0) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    resultado = (soma % 11 < 2 ? 0 : 11 - soma % 11).toString();
+    if (resultado !== digitos.charAt(1)) return false;
+    return true;
   }
 }

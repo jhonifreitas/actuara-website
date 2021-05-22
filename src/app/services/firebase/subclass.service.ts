@@ -17,7 +17,7 @@ export class SubClassService extends FirebaseAbstract<SubClass> {
     super(db, SubClassService.collectionName);
   }
 
-  getByClassIdRequired(classId: string) {
+  getByClassId(classId: string) {
     return this.getWhere('classId', '==', classId);
   }
 }

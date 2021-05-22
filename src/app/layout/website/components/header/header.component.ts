@@ -1,5 +1,8 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 
+import { StorageService } from 'src/app/services/storage.service';
+import { AuthService } from 'src/app/services/firebase/auth.service';
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -10,6 +13,8 @@ export class HeaderComponent implements OnInit {
   @Output() toggleSideBarForMe: EventEmitter<any> = new EventEmitter();
 
   constructor(
+    private _auth: AuthService,
+    public _storage: StorageService
   ) { }
 
   ngOnInit(): void {
@@ -20,5 +25,9 @@ export class HeaderComponent implements OnInit {
   toggleSideBar(): void {
     this.toggleSideBarForMe.emit();
     setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+  }
+
+  logout(): void {
+    this._auth.signOut();
   }
 }
