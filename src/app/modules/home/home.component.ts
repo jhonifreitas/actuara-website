@@ -50,7 +50,7 @@ export class HomeComponent implements OnInit {
 
   async checkCNPJ() {
     const value: string = this.controls.search.value;
-    const validators = [Validators.required]
+    const validators = [Validators.required];
     if (value.length <= 5) validators.push(Validators.minLength(5));
     else if (value.length <= 7) validators.push(Validators.minLength(7));
     else if (value.length > 7) validators.push(CustomValidator.CNPJ);
