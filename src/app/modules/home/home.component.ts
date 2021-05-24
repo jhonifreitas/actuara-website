@@ -59,11 +59,12 @@ export class HomeComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
-    this.subClassSelected = undefined;
-
     if (this.formGroup.valid) {
+      this.class = undefined;
       this.submitting = true;
+      this.company = undefined;
       this.showContact = false;
+      this.subClassSelected = undefined;
       const value = this.formGroup.value.search;
 
       try {
