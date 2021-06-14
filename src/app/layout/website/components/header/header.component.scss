@@ -1,6 +1,12 @@
-ul li {
+ul {
+  padding-left: 0;
   list-style: none;
 }
-#logo{
-  padding-left: 1rem;
+#logo {font-size: 1.3rem;}
+
+@media (min-width: 992px) {
+  #buttonSideBar {display: none;}
+}
+@media (max-width: 991px) {
+  #menu {display: none;}
 }

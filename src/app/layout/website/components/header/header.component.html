@@ -1,22 +1,29 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
-    <div id="logo"> Actuara CNAE </div>
+    <button id="buttonSideBar" mat-icon-button (click)="toggleSideBar()">
+      <mat-icon>menu</mat-icon>
+    </button>
 
-    <div fxFlex fxLayout="row" fxLayoutAlign="flex-end">
-      <ul fxLayout="row" fxLayoutGap="20px">
-        <li>
-          <button mat-button [matMenuTriggerFor]="menu">
-            <mat-icon>person_outline</mat-icon>
-            {{ _storage.getUser?.name }}
-          </button>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="logout()">
-              <mat-icon>exit_to_app</mat-icon>
-              Sair
-            </button>
-          </mat-menu>
-        </li>
-      </ul>
+    <a id="logo" mat-button routerLink="/">Actuara</a>
+
+    <div id="menu">
+      <a mat-button routerLink="/consulta">CNAE/Empresa</a>
+      <a mat-button routerLink="/multi-consulta">Empresas</a>
     </div>
+
+    <ul class="ms-auto">
+      <li>
+        <button mat-button [matMenuTriggerFor]="menu">
+          <mat-icon>person_outline</mat-icon>
+          {{ _storage.getUser?.name }}
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon>
+            Sair
+          </button>
+        </mat-menu>
+      </li>
+    </ul>
   </mat-toolbar-row>
 </mat-toolbar>

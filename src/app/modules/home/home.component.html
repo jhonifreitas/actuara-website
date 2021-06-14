@@ -7,6 +7,10 @@
       Exemplo: 11.111.111/0001-00
     </p>
     <p>
+      Para pesquisar se um CNAE precisa de licenciamento ambiental informe o Código do CNAE (Classe).<br>
+      Exemplo: 01.11-3
+    </p>
+    <p>
       Para pesquisar se um CNAE precisa de licenciamento ambiental informe o Código do CNAE (Subclasse).<br>
       Exemplo: 01.11-3-01
     </p>
@@ -26,18 +30,19 @@
 
 <!-- SUBCLASSES -->
 <mat-card class="mat-elevation-z8 text-center" *ngIf="class && !subClassSelected && !company">
-  <h2>SubClasses</h2>
+  <h2 class="mb-0">CNAE: {{ class.id | mask:'00.00-0' }}</h2>
+  <h4>Selecione uma Subclasse</h4>
   <mat-radio-group [(ngModel)]="subClassId" fxLayout="column" (change)="selectSubClass()">
     <mat-radio-button class="mb-2" *ngFor="let subclass of class._subclasses" [value]="subclass.id">{{ subclass.description }}</mat-radio-button>
   </mat-radio-group>
 </mat-card>
 
 <mat-card class="mat-elevation-z8 text-center" *ngIf="subClassSelected">
-  <h4>CNAE: {{ subClassSelected.id }}</h4>
+  <h2 class="mb-0">CNAE: {{ subClassSelected.id | mask:'00.00-0-00' }}</h2>
   <h4>Descrição: {{ subClassSelected.description }}</h4>
-  <h3 *ngIf="subClassSelected.type === 'notRequired'">Licenciamento NÃO obrigatório!</h3>
-  <h3 *ngIf="subClassSelected.type === 'required'">Licenciamento obrigatório!</h3>
-  <h3 *ngIf="subClassSelected.type === 'depend'">Consulte sobre o Licenciamento!</h3>
+  <h3 *ngIf="subClassSelected.type === 'notRequired'">Licenciamento <b>NÃO obrigatório!</b></h3>
+  <h3 *ngIf="subClassSelected.type === 'required'">Licenciamento <b>obrigatório!</b></h3>
+  <h3 *ngIf="subClassSelected.type === 'depend'"><b>Consulte</b> sobre o Licenciamento!</h3>
   <h4 *ngIf="showContact">
     Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
     <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
@@ -58,7 +63,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>{{ company.atividade_principal.code }}</td>
+          <td>{{ company.atividade_principal.code | mask:'00.00-0||00.00-0-00' }}</td>
           <td>
             <span *ngIf="company.atividade_principal.type === 'required'">Licenciamento Obrigatório</span>
             <span *ngIf="company.atividade_principal.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
@@ -66,7 +71,7 @@
           </td>
         </tr>
         <tr *ngFor="let activity of company.atividades_secundarias">
-          <td>{{ activity.code }}</td>
+          <td>{{ activity.code | mask:'00.00-0||00.00-0-00' }}</td>
           <td>
             <span *ngIf="activity.type === 'required'">Licenciamento Obrigatório</span>
             <span *ngIf="activity.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>

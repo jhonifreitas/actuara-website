@@ -34,7 +34,7 @@
   <!-- TEXTAREA -->
   <textarea matInput *ngIf="type == 'textarea'" [id]="id" [formControl]="control"
     [placeholder]="placeholder || 'Digite o ' + (label | lowercase)" [ngClass]="class"
-    [attr.cdkFocusInitial]="cdkFocus"></textarea>
+    [rows]="rows" [attr.cdkFocusInitial]="cdkFocus"></textarea>
 
   <!-- HINT -->
   <mat-hint *ngIf="hint" [innerHtml]="hint"></mat-hint>

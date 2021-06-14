@@ -87,17 +87,21 @@ export class HomeComponent implements OnInit {
             const mainCode = this.clearCode(company.atividade_principal.code);
 
             // GET MAIN
-            this._subclass.getById(mainCode)
-              .then(res => company.atividade_principal.type = res.type)
-              .catch(_ => company.atividade_principal.type = 'depend');
-            if (company.atividade_principal.type !== 'notRequired') this.showContact = true;
+            company.atividade_principal.type = 'depend';
+            if (mainCode.length === 7)
+              await this._subclass.getById(mainCode)
+                .then(res => company.atividade_principal.type = res.type)
+                .catch(_ => {});
+            // @ts-ignore
+            if (!company.atividade_principal.type !== 'notRequired') this.showContact = true;
 
             // GET SECONDARIES
             for (const activity of company.atividades_secundarias) {
               const code = this.clearCode(activity.code);
-              this._subclass.getById(code)
-                .then(res => activity.type = res.type)
-                .catch(_ => activity.type = 'depend');
+              activity.type = 'depend';
+              if (code.length === 7)
+                await this._subclass.getById(code).then(res => activity.type = res.type).catch(_ => {});
+              // @ts-ignore
               if (activity.type !== 'notRequired') this.showContact = true;
             }
 

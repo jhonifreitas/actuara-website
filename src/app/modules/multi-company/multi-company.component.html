@@ -1,0 +1,58 @@
+<mat-card class="mat-elevation-z8 text-center mb-5">
+
+  <div class="mb-4">
+    <h2>Como realizar as pesquisas:</h2>
+    <p>
+      Para pesquisar se uma empresa precisa de licenciamento ambiental informe o Número de Inscrição no Cadastro Nacional.<br>
+      Exemplo: 11.111.111/0001-00;11.111.111/0001-01;11.111.111/0001-02
+    </p>
+  </div>
+
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+    <mat-form-field class="w-100">
+      <textarea matInput [formControl]="controls.search" placeholder="Informe os CNPJ(s)" rows="3" (keyup)="validatorCNPJ()"></textarea>
+      <mat-hint>CNPJ encontrados: {{ cnpjs.length }} de {{ maxCNPJ }}</mat-hint>
+      <mat-error>
+        <div *ngIf="controls.search.hasError('required')">CNPJ(s) é <b>obrigatório</b>!</div>
+        <div *ngIf="controls.search.hasError('invalid')">
+          CNPJ(s) inválidos:
+          <ng-container *ngFor="let cnpj of cnpjs">
+            <ng-container *ngIf="!cnpj.valid">{{ cnpj.value }};</ng-container>
+          </ng-container>
+        </div>
+      </mat-error>
+    </mat-form-field>
+  
+    <button mat-raised-button type="submit" color="primary" [disabled]="submitting || formGroup.invalid || !cnpjs.length">
+      <span *ngIf="!submitting">Consultar</span>
+      <span *ngIf="submitting">Consultando...</span>
+    </button>
+  </form>
+
+</mat-card>
+
+<mat-card class="mat-elevation-z8 text-center" *ngIf="companies.length">
+  <mat-progress-bar mode="indeterminate" *ngIf="submitting"></mat-progress-bar>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th width="150">CNPJ</th>
+          <th>Resultado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let company of companies">
+          <td>{{ company.numero_de_inscricao | mask:'00.000.000/0000-00' }}</td>
+          <td>
+            <span *ngIf="company.status === 'notFound'">Não encontrado</span>
+            <span *ngIf="company.status === 'required'">Licenciamento Obrigatório</span>
+            <span *ngIf="company.status === 'notRequired'">Licenciamento NÃO Obrigatório</span>
+            <span *ngIf="company.status === 'depend'">Consulte sobre o Licenciamento</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</mat-card>

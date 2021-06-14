@@ -20,6 +20,10 @@ export class CustomValidator {
     return value.replace(/\./gi, '').replace('-', '');
   }
 
+  static cleanCNPJ(value: string): string {
+    return value.replace(/\./gi, '').replace('/', '').replace('-', '');
+  }
+
   static checkCPF(cpf: string): boolean {
     let digit1 = 0;
     let digit2 = 0;

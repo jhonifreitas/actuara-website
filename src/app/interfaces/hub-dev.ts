@@ -23,6 +23,7 @@ export interface Company {
   data_situacao_especial: string;
   capital_social: string;
   quadro_socios: string[];
+  status: 'required' | 'notRequired' | 'depend';
 }
 
 interface Activity {
