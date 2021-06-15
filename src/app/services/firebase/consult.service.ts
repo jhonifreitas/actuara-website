@@ -17,6 +17,11 @@ export class ConsultService extends FirebaseAbstract<Consult> {
     super(db, ConsultService.collectionName);
   }
 
+  async update(id: string, data: Partial<Consult>) {
+    if (data.quantity) data.quantity = data.quantity + 1; 
+    return super.update(id, data);
+  }
+
   async getByCNPJ(cnpj: string) {
     return this.getWhere('result.numero_de_inscricao', '==', cnpj, 'createdAt', 'desc', 1)
       .then(docs => docs.length ? docs[0] : Promise.reject('Not Found!'));
