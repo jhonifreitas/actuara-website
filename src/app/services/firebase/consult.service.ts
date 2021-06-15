@@ -18,7 +18,7 @@ export class ConsultService extends FirebaseAbstract<Consult> {
   }
 
   async update(id: string, data: Partial<Consult>) {
-    if (data.quantity) data.quantity = data.quantity + 1; 
+    if (data.quantity) data.quantity = data.quantity + 1;
     return super.update(id, data);
   }
 
