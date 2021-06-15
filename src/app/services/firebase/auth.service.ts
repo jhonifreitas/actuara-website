@@ -20,13 +20,12 @@ export class AuthService {
       this.auth.signInWithEmailAndPassword(email, password).then(credential => {
         if (credential.user)
           this._company.getById(credential.user.uid).then(user => {
-            if (user) resolve(user);
-            else {
-              this.signOut();
-              reject('User not found!');
-            }
+            resolve(user);
+          }).catch(_ => {
+            this.signOut();
+            reject('Usuário não encontrado!');
           });
-        else reject('User not found!');
+        else reject('Usuário não encontrado!');
       }).catch(err => reject(FirebaseErrorCodeMessages.auth[err.code] || 'Houve um erro ao realizar o login. Por favor, tente novamente.'));
     });
   }

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
+import { Consult } from 'src/app/models/consult';
 import { Company } from 'src/app/interfaces/hub-dev';
 
 import { UtilService } from 'src/app/services/util.service';
 import { CustomValidator } from 'src/app/services/validator.service';
 import { HubDevService } from 'src/app/services/api/hub-dev.service';
+import { ConsultService } from 'src/app/services/firebase/consult.service';
 import { SubClassService } from 'src/app/services/firebase/subclass.service';
 
 @Component({
@@ -21,10 +23,13 @@ export class MultiCompanyComponent implements OnInit {
   cnpjs: {value: string; valid: boolean}[] = [];
   companies: (Company | {numero_de_inscricao: string; status: 'notFound'})[] = [];
 
+  private consult = new Consult();
+
   constructor(
     private _util: UtilService,
     private _hubDev: HubDevService,
     private formBuilder: FormBuilder,
+    private _consult: ConsultService,
     private _subclass: SubClassService,
   ) {
     this.formGroup = this.formBuilder.group({
@@ -42,12 +47,11 @@ export class MultiCompanyComponent implements OnInit {
     this.cnpjs = [];
     let value: string = this.controls.search.value;
     if (value) {
-      value = value.replace(/\ /g, '').replace(/\-/g, '');;
+      value = value.replace(/\ /g, '').replace(/\-/g, '');
       const cnpjs = value.split(';');
-      for (const cnpj of cnpjs) {
+      for (const cnpj of cnpjs)
         if (this.cnpjs.length < 100)
           this.cnpjs.push({value: cnpj, valid: CustomValidator.checkCNPJ(CustomValidator.cleanCNPJ(cnpj))});
-      }
 
       this.controls.search.setErrors(this.cnpjs.find(cnpj => !cnpj.valid) ? {invalid: true} : null);
     }
@@ -57,43 +61,61 @@ export class MultiCompanyComponent implements OnInit {
     if (this.formGroup.valid) {
       this.companies = [];
       this.submitting = true;
-      
+
       for (const cnpj of this.cnpjs.filter(item => item.valid)) {
-        await this._hubDev.getCNPJ(cnpj.value).then(async company => {
-          const mainCode = this.clearCode(company.atividade_principal.code);
+        let company: (Company | void);
 
-          // GET MAIN
-          company.atividade_principal.type = 'depend';
-          if (mainCode.length === 7)
-            await this._subclass.getById(mainCode)
-              .then(res => company.atividade_principal.type = res.type)
-              .catch(_ => {});
+        const consult = await this._consult.getByCNPJ(cnpj.value).catch(_ => {});
+        if (consult) {
+          this.consult = consult;
+          const createdAt = new Date(consult.createdAt);
+          createdAt.setMonth(createdAt.getMonth() + 1);
+          if (createdAt > new Date()) company = this.consult.result;
+          else company = await this.getHubDev(cnpj.value);
+        } else company = await this.getHubDev(cnpj.value);
 
-          // GET SECONDARIES
-          if (company.status !== 'required') {
-            for (const activity of company.atividades_secundarias) {
-              const code = this.clearCode(activity.code);
-              activity.type = 'depend';
-              if (code.length === 7)
-                await this._subclass.getById(code).then(res => activity.type = res.type).catch(_ => {});
-            }
-          }
-
-          company.status = company.atividade_principal.type;
-          if (company.atividades_secundarias.filter(activity => activity.type === 'required').length)
-            company.status = 'required';
-          else if (company.atividades_secundarias.filter(activity => activity.type === 'depend').length)
-            company.status = 'depend';
-          else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
-            company.status = 'notRequired';
-          this.companies.push(company);
-        }).catch(_ => this.companies.push({numero_de_inscricao: cnpj.value, status: 'notFound'}));
+        if (company) this.companies.push(company);
+        else this.companies.push({numero_de_inscricao: cnpj.value, status: 'notFound'});
       }
 
       this.submitting = false;
     } else this._util.message('Verifique os dados antes de continuar!', 'warn');
 
     this.submitting = false;
+  }
+
+  private async getHubDev(value: string) {
+    return this._hubDev.getCNPJ(value).then(async company => {
+      const mainCode = this.clearCode(company.atividade_principal.code);
+
+      // GET MAIN
+      company.atividade_principal.type = 'depend';
+      if (mainCode.length === 7)
+        await this._subclass.getById(mainCode)
+          .then(res => company.atividade_principal.type = res.type)
+          .catch(_ => {});
+
+      // GET SECONDARIES
+      if (company.status !== 'required')
+        for (const activity of company.atividades_secundarias) {
+          const code = this.clearCode(activity.code);
+          activity.type = 'depend';
+          if (code.length === 7)
+            await this._subclass.getById(code).then(res => activity.type = res.type).catch(_ => {});
+        }
+
+      company.status = company.atividade_principal.type;
+      if (company.atividades_secundarias.filter(activity => activity.type === 'required').length)
+        company.status = 'required';
+      else if (company.atividades_secundarias.filter(activity => activity.type === 'depend').length)
+        company.status = 'depend';
+      else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
+        company.status = 'notRequired';
+
+      this.consult.result = company;
+      await this._consult.save(this.consult);
+      return company;
+    }).catch(_ => {});
   }
 
   private clearCode(code: string) {

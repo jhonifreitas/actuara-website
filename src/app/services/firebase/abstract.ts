@@ -97,9 +97,15 @@ export abstract class FirebaseAbstract<T extends Base> {
       .pipe(map(({ payload }) => (payload.exists ? this.toObject(payload) : null)));
   }
 
-  async getAll(orderBy?: string, orderDirection?: firebase.firestore.OrderByDirection): Promise<T[]> {
-    if (orderBy) {
+  async getAll(orderBy?: string, orderDirection?: firebase.firestore.OrderByDirection, limit?: number): Promise<T[]> {
+    if (orderBy && limit) {
+      const { docs } = await this.collection().orderBy(orderBy, orderDirection).limit(limit).get();
+      return docs.map(doc => this.toObject(doc));
+    } else if (orderBy) {
       const { docs } = await this.collection().orderBy(orderBy, orderDirection).get();
+      return docs.map(doc => this.toObject(doc));
+    } else if (limit) {
+      const { docs } = await this.collection().limit(limit).get();
       return docs.map(doc => this.toObject(doc));
     } else {
       const { docs } = await this.collection().get();
@@ -107,22 +113,27 @@ export abstract class FirebaseAbstract<T extends Base> {
     }
   }
 
-  async getAllActive(orderBy?: string, orderDirection?: firebase.firestore.OrderByDirection): Promise<T[]> {
-    if (orderBy) {
-      const { docs } = await this.collection().where('deletedAt', '==', null).orderBy(orderBy, orderDirection).get();
-      return docs.map(doc => this.toObject(doc));
-    } else {
-      const { docs } = await this.collection().where('deletedAt', '==', null).get();
-      return docs.map(doc => this.toObject(doc));
-    }
+  async getAllActive(orderBy?: string, orderDirection?: firebase.firestore.OrderByDirection, limit?: number): Promise<T[]> {
+    let query = this.collection().where('deletedAt', '==', null);
+    if (orderBy) query = query.orderBy(orderBy, orderDirection);
+    if (limit) query = query.limit(limit);
+
+    const { docs } = await query.get();
+    return docs.map(doc => this.toObject(doc));
   }
 
   getAsyncAll(
     orderBy?: string,
-    orderDirection?: firebase.firestore.OrderByDirection
+    orderDirection?: firebase.firestore.OrderByDirection,
+    limit?: number
   ): Observable<DocumentObservable<T>[]> {
     return this.db
-      .collection<T>(this.collectionPath, ref => (orderBy ? ref.orderBy(orderBy, orderDirection) : ref))
+      .collection<T>(this.collectionPath, ref => {
+        if (orderBy && limit) return ref.orderBy(orderBy, orderDirection).limit(limit);
+        else if (orderBy) return ref.orderBy(orderBy, orderDirection);
+        else if (limit) return ref.limit(limit);
+        else return ref;
+      })
       .stateChanges()
       .pipe(
         map(data =>
@@ -138,11 +149,13 @@ export abstract class FirebaseAbstract<T extends Base> {
 
   async getWhere(
     field: string, operator: firebase.firestore.WhereFilterOp, value: any,
-    orderBy?: string, orderDirection?: firebase.firestore.OrderByDirection
+    orderBy?: string, orderDirection?: firebase.firestore.OrderByDirection,
+    limit?: number
   ): Promise<T[]> {
     let query = this.collection().where(field, operator, value);
 
     if (orderBy) query = query.orderBy(orderBy, orderDirection);
+    if (limit) query = query.limit(limit);
 
     const { docs } = await query.get();
     return docs.map(doc => this.toObject(doc));
@@ -151,10 +164,15 @@ export abstract class FirebaseAbstract<T extends Base> {
   getAsyncWhere(
     field: string,
     operator: firebase.firestore.WhereFilterOp,
-    value: any
+    value: any,
+    limit?: number
   ): Observable<DocumentObservable<T>[]> {
     return this.db
-      .collection<T>(this.collectionPath, ref => ref.where(field, operator, value))
+      .collection<T>(this.collectionPath, ref => {
+        let query = ref.where(field, operator, value);
+        if (limit) query = query.limit(limit);
+        return query;
+      })
       .stateChanges()
       .pipe(
         map(data =>
@@ -171,7 +189,8 @@ export abstract class FirebaseAbstract<T extends Base> {
   async getWhereMany(
     filters: FirebaseWhere[],
     orderBy?: string,
-    orderDirection?: firebase.firestore.OrderByDirection
+    orderDirection?: firebase.firestore.OrderByDirection,
+    limit?: number
   ): Promise<T[]> {
     let query = this.collection().where(filters[0].field, filters[0].operator, filters[0].value);
 
@@ -180,6 +199,7 @@ export abstract class FirebaseAbstract<T extends Base> {
     for (const filter of filters) query = query.where(filter.field, filter.operator, filter.value);
 
     if (orderBy) query = query.orderBy(orderBy, orderDirection);
+    if (limit) query = query.limit(limit);
 
     const { docs } = await query.get();
     return docs.map(doc => this.toObject(doc));
@@ -188,7 +208,8 @@ export abstract class FirebaseAbstract<T extends Base> {
   getAsyncWhereMany(
     filters: FirebaseWhere[],
     orderBy?: string,
-    orderDirection?: firebase.firestore.OrderByDirection
+    orderDirection?: firebase.firestore.OrderByDirection,
+    limit?: number
   ): Observable<DocumentObservable<T>[]> {
     return this.db
       .collection<T>(this.collectionPath, ref => {
@@ -199,6 +220,7 @@ export abstract class FirebaseAbstract<T extends Base> {
         for (const filter of filters) query = query.where(filter.field, filter.operator, filter.value);
 
         if (orderBy) query = query.orderBy(orderBy, orderDirection);
+        if (limit) query = query.limit(limit);
 
         return query;
       })

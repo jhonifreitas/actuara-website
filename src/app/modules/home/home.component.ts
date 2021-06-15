@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
+import { Consult } from 'src/app/models/consult';
 import { Company } from 'src/app/interfaces/hub-dev';
 import { Class, SubClass } from 'src/app/models/class';
 
 import { UtilService } from 'src/app/services/util.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { CustomValidator } from 'src/app/services/validator.service';
 import { HubDevService } from 'src/app/services/api/hub-dev.service';
 import { ClassService } from 'src/app/services/firebase/class.service';
+import { ConsultService } from 'src/app/services/firebase/consult.service';
 import { SubClassService } from 'src/app/services/firebase/subclass.service';
 
 @Component({
@@ -25,11 +28,15 @@ export class HomeComponent implements OnInit {
   formGroup: FormGroup;
   subClassSelected?: SubClass;
 
+  private consult = new Consult();
+
   constructor(
     private _util: UtilService,
     private _class: ClassService,
     private _hubDev: HubDevService,
+    private _consult: ConsultService,
     private formBuilder: FormBuilder,
+    private _storage: StorageService,
     private _subclass: SubClassService,
   ) {
     this.formGroup = this.formBuilder.group({
@@ -82,39 +89,64 @@ export class HomeComponent implements OnInit {
           }).catch(_ => {
             throw 'CNAE não localizado na nossa base de dados';
           });
-        else if (value.length === 14)
-          await this._hubDev.getCNPJ(value).then(async company => {
-            const mainCode = this.clearCode(company.atividade_principal.code);
+        else if (value.length === 14) {
+          this.consult.company.id = this._storage.getUser.id;
+          this.consult.company.name = this._storage.getUser.name;
 
-            // GET MAIN
-            company.atividade_principal.type = 'depend';
-            if (mainCode.length === 7)
-              await this._subclass.getById(mainCode)
-                .then(res => company.atividade_principal.type = res.type)
-                .catch(_ => {});
-            // @ts-ignore
-            if (!company.atividade_principal.type !== 'notRequired') this.showContact = true;
-
-            // GET SECONDARIES
-            for (const activity of company.atividades_secundarias) {
-              const code = this.clearCode(activity.code);
-              activity.type = 'depend';
-              if (code.length === 7)
-                await this._subclass.getById(code).then(res => activity.type = res.type).catch(_ => {});
-              // @ts-ignore
-              if (activity.type !== 'notRequired') this.showContact = true;
-            }
-
-            this.company = company;
-          }).catch(_ => {
-            throw 'CNPJ Não Encontrado';
-          });
+          const consult = await this._consult.getByCNPJ(value).catch(_ => {});
+          if (consult) {
+            this.consult = consult;
+            const createdAt = new Date(consult.createdAt);
+            createdAt.setMonth(createdAt.getMonth() + 1);
+            if (createdAt > new Date()) this.company = this.consult.result;
+            else await this.getHubDev(value);
+          } else await this.getHubDev(value);
+        }
       } catch (error) {
         this._util.message(`${error}, verifique os dados informados.`, 'warn');
       }
     } else this._util.message('Verifique os dados antes de continuar!', 'warn');
 
     this.submitting = false;
+  }
+
+  private async getHubDev(value: string) {
+    await this._hubDev.getCNPJ(value).then(async company => {
+      const mainCode = this.clearCode(company.atividade_principal.code);
+
+      // GET MAIN
+      company.atividade_principal.type = 'depend';
+      if (mainCode.length === 7)
+        await this._subclass.getById(mainCode)
+          .then(res => company.atividade_principal.type = res.type)
+          .catch(_ => {});
+      // @ts-ignore
+      if (!company.atividade_principal.type !== 'notRequired') this.showContact = true;
+
+      // GET SECONDARIES
+      for (const activity of company.atividades_secundarias) {
+        const code = this.clearCode(activity.code);
+        activity.type = 'depend';
+        if (code.length === 7)
+          await this._subclass.getById(code).then(res => activity.type = res.type).catch(_ => {});
+        // @ts-ignore
+        if (activity.type !== 'notRequired') this.showContact = true;
+      }
+
+      company.status = company.atividade_principal.type;
+      if (company.atividades_secundarias.filter(activity => activity.type === 'required').length)
+        company.status = 'required';
+      else if (company.atividades_secundarias.filter(activity => activity.type === 'depend').length)
+        company.status = 'depend';
+      else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
+        company.status = 'notRequired';
+
+      this.consult.result = company;
+      await this._consult.save(this.consult);
+      this.company = company;
+    }).catch(_ => {
+      throw 'CNPJ Não Encontrado';
+    });
   }
 
   private clearCode(code: string) {
