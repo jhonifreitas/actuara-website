@@ -1,9 +1,9 @@
 import { Base } from './base';
-import { Company as HubDevResult } from '../interfaces/hub-dev';
+import { Company as HubDev } from '../interfaces/hub-dev';
 
 export class Consult extends Base {
   company: Company;
-  result!: HubDevResult;
+  result!: HubDev;
 
   constructor() {
     super();
