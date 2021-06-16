@@ -112,12 +112,15 @@ export class HomeComponent implements OnInit {
 
   private async getHubDev(value: string) {
     await this._hubDev.getCNPJ(value).then(async company => {
-      const mainCode = this.clearCode(company.atividade_principal.code);
+      company.atividade_principal.code = this.clearCode(company.atividade_principal.code);
 
       // GET MAIN
       company.atividade_principal.type = 'depend';
-      if (mainCode.length === 7)
-        await this._subclass.getById(mainCode)
+      if (company.atividade_principal.code.length === 5) {
+        const subclasses = await this._subclass.getByClassIdByType(company.atividade_principal.code, 'required');
+        if (subclasses.length) company.atividade_principal.type = 'required';
+      } else if (company.atividade_principal.code.length === 7)
+        await this._subclass.getById(company.atividade_principal.code)
           .then(res => company.atividade_principal.type = res.type)
           .catch(_ => {});
       // @ts-ignore
@@ -125,21 +128,26 @@ export class HomeComponent implements OnInit {
 
       // GET SECONDARIES
       for (const activity of company.atividades_secundarias) {
-        const code = this.clearCode(activity.code);
+        activity.code = this.clearCode(activity.code);
         activity.type = 'depend';
-        if (code.length === 7)
-          await this._subclass.getById(code).then(res => activity.type = res.type).catch(_ => {});
+        if (activity.code.length === 5) {
+          const subclasses = await this._subclass.getByClassIdByType(activity.code, 'required');
+          if (subclasses.length) activity.type = 'required';
+        } else if (activity.code.length === 7)
+          await this._subclass.getById(activity.code).then(res => activity.type = res.type).catch(_ => {});
         // @ts-ignore
         if (activity.type !== 'notRequired') this.showContact = true;
       }
 
       company.status = company.atividade_principal.type;
-      if (company.atividades_secundarias.filter(activity => activity.type === 'required').length)
-        company.status = 'required';
-      else if (company.atividades_secundarias.filter(activity => activity.type === 'depend').length)
-        company.status = 'depend';
-      else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
-        company.status = 'notRequired';
+      if (company.status !== 'required') {
+        if (company.atividades_secundarias.filter(activity => activity.type === 'required').length)
+          company.status = 'required';
+        else if (company.atividades_secundarias.filter(activity => activity.type === 'depend').length)
+          company.status = 'depend';
+        else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
+          company.status = 'notRequired';
+      }
 
       this.consult.result = company;
       await this._consult.save(this.consult);

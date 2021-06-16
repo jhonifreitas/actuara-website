@@ -58,24 +58,27 @@
       <thead>
         <tr>
           <th width="100">CNAE</th>
+          <th>Descrição</th>
           <th>Resultado</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>{{ company.atividade_principal.code | mask:'00.00-0||00.00-0-00' }}</td>
-          <td>
-            <span *ngIf="company.atividade_principal.type === 'required'">Licenciamento Obrigatório</span>
-            <span *ngIf="company.atividade_principal.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
-            <span *ngIf="company.atividade_principal.type === 'depend'">Consulte sobre o Licenciamento</span>
+          <td>{{ company.atividade_principal.code | mask:'00.00-0-00||00.00-0' }}</td>
+          <td>{{ company.atividade_principal.text }}</td>
+          <td class="fw-bold">
+            <span class="text-warn" *ngIf="company.atividade_principal.type === 'required'">Licenciamento Obrigatório</span>
+            <span class="text-orange" *ngIf="company.atividade_principal.type === 'depend'">Consulte sobre o Licenciamento</span>
+            <span class="text-success" *ngIf="company.atividade_principal.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
           </td>
         </tr>
         <tr *ngFor="let activity of company.atividades_secundarias">
-          <td>{{ activity.code | mask:'00.00-0||00.00-0-00' }}</td>
-          <td>
-            <span *ngIf="activity.type === 'required'">Licenciamento Obrigatório</span>
-            <span *ngIf="activity.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
-            <span *ngIf="activity.type === 'depend'">Consulte sobre o Licenciamento</span>
+          <td>{{ activity.code | mask:'00.00-0-00||00.00-0' }}</td>
+          <td>{{ activity.text }}</td>
+          <td class="fw-bold">
+            <span class="text-warn" *ngIf="activity.type === 'required'">Licenciamento Obrigatório</span>
+            <span class="text-orange" *ngIf="activity.type === 'depend'">Consulte sobre o Licenciamento</span>
+            <span class="text-success" *ngIf="activity.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
           </td>
         </tr>
       </tbody>

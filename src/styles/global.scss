@@ -6,6 +6,7 @@
 @import './components/form';
 @import './components/font';
 @import './components/table';
+@import './components/color';
 @import './components/spacing';
 
 html, body {height: 100%;}
@@ -46,10 +47,18 @@ app-sidebar {
 mat-icon[color="success"] {
   color: mat-color($success);
 }
+mat-icon[color="orange"] {
+  color: mat-color($orange);
+}
 
 snack-bar-container.mat-warn {
   color: #FFF;
   background: mat-color($warn);
+  .mat-simple-snackbar-action {color: #fff;}
+}
+snack-bar-container.mat-orange {
+  color: #FFF;
+  background: mat-color($orange);
   .mat-simple-snackbar-action {color: #fff;}
 }
 snack-bar-container {
@@ -62,5 +71,10 @@ snack-bar-container {
     color: mat-color($warn, default-contrast);
     background: mat-color($warn);
     .mat-simple-snackbar-action {color: mat-color($warn, default-contrast);}
+  }
+  &.mat-orange {
+    color: mat-color($orange, default-contrast);
+    background: mat-color($orange);
+    .mat-simple-snackbar-action {color: mat-color($orange, default-contrast);}
   }
 }

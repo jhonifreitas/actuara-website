@@ -21,7 +21,7 @@ export class UtilService {
 
   message(
     text: string,
-    color?: 'success' | 'warn',
+    color?: 'success' | 'warn' | 'orange',
     action?: string,
     duration?: number,
     horizontal?: 'start' | 'center' | 'end',
