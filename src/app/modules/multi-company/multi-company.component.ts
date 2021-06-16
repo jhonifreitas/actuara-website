@@ -115,14 +115,13 @@ export class MultiCompanyComponent implements OnInit {
         }
 
       company.status = company.atividade_principal.type;
-      if (company.status !== 'required') {
+      if (company.status !== 'required')
         if (company.atividades_secundarias.filter(activity => activity.type === 'required').length)
           company.status = 'required';
         else if (company.atividades_secundarias.filter(activity => activity.type === 'depend').length)
           company.status = 'depend';
         else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
           company.status = 'notRequired';
-      }
 
       this.consult.result = company;
       await this._consult.save(this.consult);
