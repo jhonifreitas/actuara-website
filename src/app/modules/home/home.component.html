@@ -43,50 +43,10 @@
   <h3 *ngIf="subClassSelected.type === 'notRequired'">Licenciamento <b>NÃO obrigatório!</b></h3>
   <h3 *ngIf="subClassSelected.type === 'required'">Licenciamento <b>obrigatório!</b></h3>
   <h3 *ngIf="subClassSelected.type === 'depend'"><b>Consulte</b> sobre o Licenciamento!</h3>
-  <h4 *ngIf="showContact">
+  <h4 *ngIf="subClassSelected.type !== 'notRequired'">
     Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
     <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
   </h4>
 </mat-card>
 
-<mat-card class="mat-elevation-z8 text-center" *ngIf="company">
-  <h4 class="mb-0">CNPJ: {{ company.numero_de_inscricao | mask:'00.000.000/0000-00' }}</h4>
-  <h4 class="mt-0">Razão Social: {{ company.nome }}</h4>
-  
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th width="100">CNAE</th>
-          <th>Descrição</th>
-          <th>Resultado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{{ company.atividade_principal.code | mask:'00.00-0-00||00.00-0' }}</td>
-          <td>{{ company.atividade_principal.text }}</td>
-          <td class="fw-bold">
-            <span class="text-warn" *ngIf="company.atividade_principal.type === 'required'">Licenciamento Obrigatório</span>
-            <span class="text-orange" *ngIf="company.atividade_principal.type === 'depend'">Consulte sobre o Licenciamento</span>
-            <span class="text-success" *ngIf="company.atividade_principal.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
-          </td>
-        </tr>
-        <tr *ngFor="let activity of company.atividades_secundarias">
-          <td>{{ activity.code | mask:'00.00-0-00||00.00-0' }}</td>
-          <td>{{ activity.text }}</td>
-          <td class="fw-bold">
-            <span class="text-warn" *ngIf="activity.type === 'required'">Licenciamento Obrigatório</span>
-            <span class="text-orange" *ngIf="activity.type === 'depend'">Consulte sobre o Licenciamento</span>
-            <span class="text-success" *ngIf="activity.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h4 *ngIf="showContact" class="mt-4">
-    Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
-    <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
-  </h4>
-</mat-card>
+<app-company-detail [company]="company"></app-company-detail>

@@ -1,0 +1,72 @@
+<mat-card class="mat-elevation-z8 text-center" *ngIf="company">
+  <h4 class="mb-0"><b>CNPJ:</b> {{ company.numero_de_inscricao | mask:'00.000.000/0000-00' }}</h4>
+  <h4 class="mt-0"><b>Razão Social:</b> {{ company.nome }}</h4>
+  
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th width="100">CNAE</th>
+          <th>Descrição</th>
+          <th>Resultado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ company.atividade_principal.code | mask:'00.00-0-00||00.00-0' }}</td>
+          <td>{{ company.atividade_principal.text }}</td>
+          <td class="fw-bold">
+            <span class="text-warn" *ngIf="company.atividade_principal.type === 'required'">Licenciamento Obrigatório</span>
+            <span class="text-orange" *ngIf="company.atividade_principal.type === 'depend'">Consulte sobre o Licenciamento</span>
+            <span class="text-success" *ngIf="company.atividade_principal.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
+          </td>
+        </tr>
+        <tr *ngFor="let activity of company.atividades_secundarias">
+          <td>{{ activity.code | mask:'00.00-0-00||00.00-0' }}</td>
+          <td>{{ activity.text }}</td>
+          <td class="fw-bold">
+            <span class="text-warn" *ngIf="activity.type === 'required'">Licenciamento Obrigatório</span>
+            <span class="text-orange" *ngIf="activity.type === 'depend'">Consulte sobre o Licenciamento</span>
+            <span class="text-success" *ngIf="activity.type === 'notRequired'">Licenciamento NÃO Obrigatório</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 *ngIf="showContact" class="mt-4">
+    Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
+    <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
+  </h4>
+</mat-card>
+
+<!-- LICENSES -->
+<mat-card class="mat-elevation-z8 text-center mt-5" *ngIf="company && company.licenses?.length">
+  <h2 class="mt-0">Licenças</h2>
+  
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th width="100">Validade</th>
+          <th>Atividade</th>
+          <th>Numero da Licença</th>
+          <th>FCE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let license of company.licenses">
+          <td>{{ license.dtValidade ? (license.dtValidade | date: 'dd/MM/yyyy') : '---' }}</td>
+          <td>{{ license.tipoLicencaResumo || '---' }}</td>
+          <td>{{ license.numeroDocumento || '---' }}</td>
+          <td>{{ license.fce || '---' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 *ngIf="showContact" class="mt-4">
+    Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
+    <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
+  </h4>
+</mat-card>

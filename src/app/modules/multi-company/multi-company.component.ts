@@ -5,6 +5,7 @@ import { Consult } from 'src/app/models/consult';
 import { Company } from 'src/app/interfaces/hub-dev';
 
 import { UtilService } from 'src/app/services/util.service';
+import { IMAService } from 'src/app/services/api/ima.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { CustomValidator } from 'src/app/services/validator.service';
 import { HubDevService } from 'src/app/services/api/hub-dev.service';
@@ -21,12 +22,14 @@ export class MultiCompanyComponent implements OnInit {
   maxCNPJ = 100; // 20.654.105/0001-71;05.346.462/0001-89;66.362.008/0001-06
   submitting = false;
   formGroup: FormGroup;
+  companySelected?: Company;
   cnpjs: {value: string; valid: boolean}[] = [];
   companies: (Company | {numero_de_inscricao: string; status: 'notFound'})[] = [];
 
   private consult = new Consult();
 
   constructor(
+    private _ima: IMAService,
     private _util: UtilService,
     private _hubDev: HubDevService,
     private formBuilder: FormBuilder,
@@ -57,6 +60,10 @@ export class MultiCompanyComponent implements OnInit {
 
       this.controls.search.setErrors(this.cnpjs.find(cnpj => !cnpj.valid) ? {invalid: true} : null);
     }
+  }
+
+  companySelect(company: Company | {numero_de_inscricao: string; status: 'notFound'}) {
+    if (company.status !== 'notFound') this.companySelected = company;
   }
 
   async onSubmit(): Promise<void> {
@@ -123,8 +130,12 @@ export class MultiCompanyComponent implements OnInit {
         else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
           company.status = 'notRequired';
 
+      // LICENSES
+      company.licenses = await this._ima.getLicense(company.numero_de_inscricao).catch(_ => []);
+          
       this.consult.result = company;
       await this._consult.save(this.consult);
+
       return company;
     }).catch(_ => {});
   }

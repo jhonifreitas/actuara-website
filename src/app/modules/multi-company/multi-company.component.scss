@@ -6,4 +6,13 @@ table {
     padding: .5rem 1rem;
     border: 1px solid #000;
   }
+
+  &.table-hover {
+    tbody {
+      tr {
+        cursor: pointer;
+        &:hover {background-color: rgba(0,0,0,.05);}
+      }
+    }
+  }
 }

@@ -8,6 +8,7 @@ import { NgxMaskModule } from 'ngx-mask';
 // MODULE
 import { MatRadioModule } from '@angular/material/radio';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { CompanyDetailModule } from '../company-detail/detail.module';
 
 // COMPONENT
 import { MultiCompanyComponent } from './multi-company.component';
@@ -20,6 +21,7 @@ import { MultiCompanyComponent } from './multi-company.component';
     NgxMaskModule,
     MatRadioModule,
     ReactiveFormsModule,
+    CompanyDetailModule,
   ],
   declarations: [MultiCompanyComponent],
 })

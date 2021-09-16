@@ -8,10 +8,9 @@ import { NgxMaskModule } from 'ngx-mask';
 // MODULE
 import { MatRadioModule } from '@angular/material/radio';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { CompanyDetailModule } from '../company-detail/detail.module';
 
 // COMPONENT
-import { HomeComponent } from './home.component';
+import { CompanyDetailComponent } from './detail.component';
 
 @NgModule({
   imports: [
@@ -21,8 +20,8 @@ import { HomeComponent } from './home.component';
     NgxMaskModule,
     MatRadioModule,
     ReactiveFormsModule,
-    CompanyDetailModule,
   ],
-  declarations: [HomeComponent],
+  declarations: [CompanyDetailComponent],
+  exports: [CompanyDetailComponent],
 })
-export class HomeModule {}
+export class CompanyDetailModule {}

@@ -6,6 +6,7 @@ import { Company } from 'src/app/interfaces/hub-dev';
 import { Class, SubClass } from 'src/app/models/class';
 
 import { UtilService } from 'src/app/services/util.service';
+import { IMAService } from 'src/app/services/api/ima.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { CustomValidator } from 'src/app/services/validator.service';
 import { HubDevService } from 'src/app/services/api/hub-dev.service';
@@ -24,13 +25,13 @@ export class HomeComponent implements OnInit {
   company?: Company;
   submitting = false;
   subClassId!: string;
-  showContact = false;
   formGroup: FormGroup;
   subClassSelected?: SubClass;
 
   private consult = new Consult();
 
   constructor(
+    private _ima: IMAService,
     private _util: UtilService,
     private _class: ClassService,
     private _hubDev: HubDevService,
@@ -70,7 +71,6 @@ export class HomeComponent implements OnInit {
       this.class = undefined;
       this.submitting = true;
       this.company = undefined;
-      this.showContact = false;
       this.subClassSelected = undefined;
       const value = this.formGroup.value.search;
 
@@ -85,7 +85,6 @@ export class HomeComponent implements OnInit {
         else if (value.length === 7)
           await this._subclass.getById(value).then(async res => {
             this.subClassSelected = res;
-            if (res.type !== 'notRequired') this.showContact = true;
           }).catch(_ => {
             throw 'CNAE não localizado na nossa base de dados';
           });
@@ -135,8 +134,6 @@ export class HomeComponent implements OnInit {
           if (subclasses.length) activity.type = 'required';
         } else if (activity.code.length === 7)
           await this._subclass.getById(activity.code).then(res => activity.type = res.type).catch(_ => {});
-        // @ts-ignore
-        if (activity.type !== 'notRequired') this.showContact = true;
       }
 
       company.status = company.atividade_principal.type;
@@ -147,6 +144,9 @@ export class HomeComponent implements OnInit {
           company.status = 'depend';
         else if (company.atividades_secundarias.filter(activity => activity.type === 'notRequired').length)
           company.status = 'notRequired';
+
+      // LICENSES
+      this._ima.getLicense(company.numero_de_inscricao).then(res => company.licenses = res).catch(_ => {});
 
       this.consult.result = company;
       await this._consult.save(this.consult);
