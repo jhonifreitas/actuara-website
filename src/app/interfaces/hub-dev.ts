@@ -1,4 +1,4 @@
-import { License } from "./ima";
+import { License } from './ima';
 
 export interface Company {
   numero_de_inscricao: string;
@@ -25,7 +25,7 @@ export interface Company {
   data_situacao_especial: string;
   capital_social: string;
   quadro_socios: string[];
-  
+
   status: 'required' | 'notRequired' | 'depend';
 
   licenses: License[];

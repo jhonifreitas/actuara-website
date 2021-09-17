@@ -132,7 +132,7 @@ export class MultiCompanyComponent implements OnInit {
 
       // LICENSES
       company.licenses = await this._ima.getLicense(company.numero_de_inscricao).catch(_ => []);
-          
+
       this.consult.result = company;
       await this._consult.save(this.consult);
 

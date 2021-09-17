@@ -10,15 +10,14 @@ import { Company } from 'src/app/interfaces/hub-dev';
 export class CompanyDetailComponent implements OnChanges {
 
   @Input() company?: Company;
-  
-  showContact: boolean = false;
+
+  showContact = false;
 
   constructor() { }
 
   ngOnChanges(): void {
     this.showContact = false;
-    if (this.company) {
+    if (this.company)
       if (this.company.status !== 'notRequired') this.showContact = true;
-    }
   }
 }
