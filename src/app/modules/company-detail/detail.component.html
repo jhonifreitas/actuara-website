@@ -6,7 +6,7 @@
     <ng-container [ngTemplateOutlet]="contactTemplate" *ngIf="showContact"></ng-container>
   </div>
 
-  <div class="text-center mt-5" [ngClass]="{'mat-card mat-elevation-z8': matCard}" *ngIf="company && company.licenses?.length">
+  <div class="text-center mt-5" [ngClass]="{'mat-card mat-elevation-z8': matCard}" *ngIf="company && company.licenses.length">
     <ng-container [ngTemplateOutlet]="licenseTemplate" [ngTemplateOutletContext]="{licenses: company.licenses}"></ng-container>
     <ng-container [ngTemplateOutlet]="contactTemplate" *ngIf="showContact"></ng-container>
   </div>

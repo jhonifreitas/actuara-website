@@ -13,6 +13,6 @@ export class IMAService {
   ) { }
 
   async getLicense(cnpj: string): Promise<License[]> {
-    return this._api.get(`ima/${cnpj}/license`).then(res => res.result);
+    return this._api.get(`ima/${cnpj}/license`).then(res => res.result).catch(_ => []);
   }
 }

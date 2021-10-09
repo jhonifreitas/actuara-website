@@ -71,6 +71,7 @@ export class HomeComponent implements OnInit {
       this.class = undefined;
       this.submitting = true;
       this.company = undefined;
+      this.consult = new Consult();
       this.subClassSelected = undefined;
       const value = this.formGroup.value.search;
 
@@ -100,7 +101,7 @@ export class HomeComponent implements OnInit {
             if (createdAt > new Date()) {
               const company = this.consult.result;
               if (!company.licenses.length)
-                this._ima.getLicense(company.numero_de_inscricao).then(res => company.licenses = res).catch(_ => {});
+                company.licenses = await this._ima.getLicense(company.numero_de_inscricao);
               this.company = company;
             } else await this.getHubDev(value);
           } else await this.getHubDev(value);
@@ -150,7 +151,7 @@ export class HomeComponent implements OnInit {
           company.status = 'notRequired';
 
       // LICENSES
-      this._ima.getLicense(company.numero_de_inscricao).then(res => company.licenses = res).catch(_ => {});
+      company.licenses = await this._ima.getLicense(company.numero_de_inscricao);
 
       this.consult.result = company;
       await this._consult.save(this.consult);

@@ -68,6 +68,7 @@ export class MultiCompanyComponent implements OnInit {
 
       for (const cnpj of this.cnpjs.filter(item => item.valid)) {
         let company: (Company | void);
+        this.consult = new Consult();
         this.consult.company.id = this._storage.getUser.id;
         this.consult.company.name = this._storage.getUser.name;
 
@@ -79,9 +80,7 @@ export class MultiCompanyComponent implements OnInit {
           if (createdAt > new Date()) {
             company = this.consult.result;
             if (!company.licenses.length)
-              this._ima.getLicense(company.numero_de_inscricao).then(res => {
-                if (company) company.licenses = res;
-              }).catch(_ => {});
+              company.licenses = await this._ima.getLicense(company.numero_de_inscricao);
           } else company = await this.getHubDev(cnpj.value);
         } else company = await this.getHubDev(cnpj.value);
 
@@ -131,7 +130,7 @@ export class MultiCompanyComponent implements OnInit {
           company.status = 'notRequired';
 
       // LICENSES
-      company.licenses = await this._ima.getLicense(company.numero_de_inscricao).catch(_ => []);
+      company.licenses = await this._ima.getLicense(company.numero_de_inscricao);
 
       this.consult.result = company;
       await this._consult.save(this.consult);
