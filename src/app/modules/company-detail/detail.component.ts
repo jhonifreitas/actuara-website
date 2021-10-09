@@ -9,8 +9,8 @@ import { Company } from 'src/app/interfaces/hub-dev';
 })
 export class CompanyDetailComponent implements OnChanges {
 
+  @Input() matCard = true;
   @Input() company?: Company;
-  @Input() matCard: boolean = true;
 
   showContact = false;
 
