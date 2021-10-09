@@ -97,8 +97,12 @@ export class HomeComponent implements OnInit {
             this.consult = consult;
             const createdAt = new Date(consult.createdAt);
             createdAt.setMonth(createdAt.getMonth() + 1);
-            if (createdAt > new Date()) this.company = this.consult.result;
-            else await this.getHubDev(value);
+            if (createdAt > new Date()) {
+              const company = this.consult.result;
+              if (!company.licenses.length)
+                this._ima.getLicense(company.numero_de_inscricao).then(res => company.licenses = res).catch(_ => {});
+              this.company = company;
+            } else await this.getHubDev(value);
           } else await this.getHubDev(value);
         }
       } catch (error) {

@@ -76,8 +76,13 @@ export class MultiCompanyComponent implements OnInit {
           this.consult = consult;
           const createdAt = new Date(consult.createdAt);
           createdAt.setMonth(createdAt.getMonth() + 1);
-          if (createdAt > new Date()) company = this.consult.result;
-          else company = await this.getHubDev(cnpj.value);
+          if (createdAt > new Date()) {
+            company = this.consult.result;
+            if (!company.licenses.length)
+              this._ima.getLicense(company.numero_de_inscricao).then(res => {
+                if (company) company.licenses = res;
+              }).catch(_ => {});
+          } else company = await this.getHubDev(cnpj.value);
         } else company = await this.getHubDev(cnpj.value);
 
         if (company) this.companies.push(company);
