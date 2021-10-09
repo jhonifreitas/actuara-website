@@ -31,30 +31,15 @@
 
 </mat-card>
 
-<mat-card class="mat-elevation-z8 text-center" [class.mb-5]="companySelected" *ngIf="companies.length">
-  <mat-progress-bar mode="indeterminate" *ngIf="submitting"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" *ngIf="submitting"></mat-progress-bar>
+<mat-card class="mat-elevation-z8 text-center mb-4" *ngFor="let company of companies">
 
-  <div class="table-responsive">
-    <table class="table-hover">
-      <thead>
-        <tr>
-          <th width="150">CNPJ</th>
-          <th>Resultado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let company of companies" (click)="companySelect(company)">
-          <td>{{ company.numero_de_inscricao | mask:'00.000.000/0000-00' }}</td>
-          <td class="fw-bold">
-            <span *ngIf="company.status === 'notFound'">Não encontrado</span>
-            <span class="text-warn" *ngIf="company.status === 'required'">Licenciamento Obrigatório</span>
-            <span class="text-orange" *ngIf="company.status === 'depend'">Consulte sobre o Licenciamento</span>
-            <span class="text-success" *ngIf="company.status === 'notRequired'">Licenciamento NÃO Obrigatório</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <ng-container *ngIf="company.status === 'notFound'">
+    <h4 class="mb-0"><b>CNPJ:</b> {{ company.numero_de_inscricao | mask:'00.000.000/0000-00' }}</h4>
+    <h3 class="mt-0">Não encontrado</h3>
+  </ng-container>
+
+  <app-company-detail *ngIf="company.status !== 'notFound'" [company]="company" [matCard]="false"></app-company-detail>
 </mat-card>
 
-<app-company-detail [company]="companySelected"></app-company-detail>
+

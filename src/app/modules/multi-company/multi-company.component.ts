@@ -22,7 +22,6 @@ export class MultiCompanyComponent implements OnInit {
   maxCNPJ = 100; // 20.654.105/0001-71;05.346.462/0001-89;66.362.008/0001-06
   submitting = false;
   formGroup: FormGroup;
-  companySelected?: Company;
   cnpjs: {value: string; valid: boolean}[] = [];
   companies: (Company | {numero_de_inscricao: string; status: 'notFound'})[] = [];
 
@@ -60,10 +59,6 @@ export class MultiCompanyComponent implements OnInit {
 
       this.controls.search.setErrors(this.cnpjs.find(cnpj => !cnpj.valid) ? {invalid: true} : null);
     }
-  }
-
-  companySelect(company: Company | {numero_de_inscricao: string; status: 'notFound'}) {
-    if (company.status !== 'notFound') this.companySelected = company;
   }
 
   async onSubmit(): Promise<void> {

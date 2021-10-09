@@ -1,7 +1,34 @@
-<mat-card class="mat-elevation-z8 text-center" *ngIf="company">
+<ng-container *ngIf="company">
+
+  <div class="text-center" [ngClass]="{'mat-card mat-elevation-z8': matCard}">
+    <ng-container [ngTemplateOutlet]="detailTemplate" [ngTemplateOutletContext]="{company: company}"></ng-container>
+    <ng-container [ngTemplateOutlet]="cnaeTemplate" [ngTemplateOutletContext]="{company: company}"></ng-container>
+    <ng-container [ngTemplateOutlet]="contactTemplate" *ngIf="showContact"></ng-container>
+  </div>
+
+  <div class="text-center mt-5" [ngClass]="{'mat-card mat-elevation-z8': matCard}" *ngIf="company && company.licenses?.length">
+    <ng-container [ngTemplateOutlet]="licenseTemplate" [ngTemplateOutletContext]="{licenses: company.licenses}"></ng-container>
+    <ng-container [ngTemplateOutlet]="contactTemplate" *ngIf="showContact"></ng-container>
+  </div>
+</ng-container>
+
+
+<!-- DETAIL TEMPLATE -->
+<ng-template #detailTemplate let-company="company">
   <h4 class="mb-0"><b>CNPJ:</b> {{ company.numero_de_inscricao | mask:'00.000.000/0000-00' }}</h4>
   <h4 class="mt-0"><b>Razão Social:</b> {{ company.nome }}</h4>
-  
+</ng-template>
+
+<!-- CONTACT TEMPLATE -->
+<ng-template #contactTemplate>
+  <h4 class="mt-4">
+    Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
+    <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
+  </h4>
+</ng-template>
+
+<!-- CNAE TEMPLATE -->
+<ng-template #cnaeTemplate let-company="company">
   <div class="table-responsive">
     <table>
       <thead>
@@ -33,15 +60,10 @@
       </tbody>
     </table>
   </div>
+</ng-template>
 
-  <h4 *ngIf="showContact" class="mt-4">
-    Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
-    <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
-  </h4>
-</mat-card>
-
-<!-- LICENSES -->
-<mat-card class="mat-elevation-z8 text-center mt-5" *ngIf="company && company.licenses?.length">
+<!-- LICENSES TEMPLATE -->
+<ng-template #licenseTemplate let-licenses="licenses">
   <h2 class="mt-0">Licenças</h2>
   
   <div class="table-responsive">
@@ -55,7 +77,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let license of company.licenses">
+        <tr *ngFor="let license of licenses">
           <td>{{ license.dtValidade ? (license.dtValidade | date: 'dd/MM/yyyy') : '---' }}</td>
           <td>{{ license.tipoLicencaResumo || '---' }}</td>
           <td>{{ license.numeroDocumento || '---' }}</td>
@@ -64,9 +86,4 @@
       </tbody>
     </table>
   </div>
-
-  <h4 *ngIf="showContact" class="mt-4">
-    Entre em contato conosco para verificar o licenciamento e demais obrigatoriedades pelo e-mail
-    <a href="mailto:contato@actuara.com.br">contato@actuara.com.br</a>
-  </h4>
-</mat-card>
+</ng-template>
